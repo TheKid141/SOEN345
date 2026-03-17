@@ -34,8 +34,11 @@ android {
     }
 
     testOptions {
-        unitTests.all {
-            it.useJUnitPlatform()
+        unitTests{
+            isIncludeAndroidResources = true
+            all {
+                it.useJUnitPlatform()
+            }
         }
     }
 }
@@ -60,4 +63,6 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    androidTestImplementation("androidx.test:core:1.5.0")
 }

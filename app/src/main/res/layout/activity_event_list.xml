@@ -2,30 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🚧 Under Construction 🚧"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textAlignment="center"/>
+        android:layout_marginBottom="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Event Discovery Coming Soon"
-        android:textSize="18sp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="32dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upcoming Events"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_centerVertical="true"/>
 
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout" />
+        <Button
+            android:id="@+id/btnFilter"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Filter"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:textAllCaps="false" />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
