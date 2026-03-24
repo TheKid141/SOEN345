@@ -5,15 +5,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.List;
+import java.util.Objects;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolder> {
 
-    private List<Event> eventList;
+    public EventAdapter() {
+        super(new DiffUtil.ItemCallback<Event>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Event oldItem, @NonNull Event newItem) {
+                // Safely compare titles even if one is null
+                return Objects.equals(oldItem.getTitle(), newItem.getTitle());
+            }
 
-    public EventAdapter(List<Event> eventList) {
-        this.eventList = eventList;
+            @Override
+            public boolean areContentsTheSame(@NonNull Event oldItem, @NonNull Event newItem) {
+                // Safely compare both fields
+                return Objects.equals(oldItem.getTitle(), newItem.getTitle()) &&
+                        Objects.equals(oldItem.getLocation(), newItem.getLocation());
+            }
+        });
     }
 
     @NonNull
@@ -25,21 +38,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
-        Event event = eventList.get(position);
+        Event event = getItem(position);
         holder.tvTitle.setText(event.getTitle());
-        holder.tvDate.setText("\uD83D\uDCC5 " + event.getDate() + " @ " + event.getDateTime());
-        holder.tvLocation.setText("\uD83D\uDCCD " + event.getLocation());
-        holder.tvCategory.setText("\uD83C\uDFF7 " + event.getCategory());
-    }
-
-    @Override
-    public int getItemCount() {
-        return eventList.size();
-    }
-
-    public void updateList(List<Event> newList) {
-        this.eventList = newList;
-        notifyDataSetChanged();
+        holder.tvDate.setText(holder.itemView.getContext().getString(R.string.event_date_format, event.getDate(), event.getDateTime()));
+        holder.tvLocation.setText(holder.itemView.getContext().getString(R.string.event_location_format, event.getLocation()));
+        holder.tvCategory.setText(holder.itemView.getContext().getString(R.string.event_category_format, event.getCategory()));
     }
 
     static class EventViewHolder extends RecyclerView.ViewHolder {

@@ -1,27 +1,30 @@
 package com.example.ticketreservationapp;
 
-public class LoginValidator {
+public class InputValidator {
 
-    public String EmailValidator(String email){
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]{2,}$";
+
+    public String validateEmail(String email){
         if(email == null || email.trim().isEmpty()){
             return "Please enter an email address";
         }
-        if(!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")){
+        if(!email.matches(EMAIL_REGEX)){
             return "Please enter a valid email address";
         }
         return null;
     }
 
-    public String PasswordValidator(String password) {
-        if(password == null || password.trim().isEmpty()){
+    public String validatePassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
             return "Please enter a password";
+        }
+        if (password.trim().length() < 6) {
+            return "Password must be at least 6 characters";
         }
         return null;
     }
 
     public boolean isRoleSelectionValid(boolean isAdminSelected) {
-        // Admin portal is currently blocked/under construction
-        //TODO This method needs to be updated when Admin is added.
         return !isAdminSelected;
     }
 }

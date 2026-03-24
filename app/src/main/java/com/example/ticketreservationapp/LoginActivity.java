@@ -6,8 +6,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
@@ -17,9 +17,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView goToRegisterText;
     private RadioButton radioAdmin;
-
-    // Declaring the validator
-    private LoginValidator validator;
+    private InputValidator validator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +25,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-
-        // Initializing the validator
-        validator = new LoginValidator();
+        validator = new InputValidator();
 
         emailEditText = findViewById(R.id.loginEmailEditText);
         passwordEditText = findViewById(R.id.loginPasswordEditText);
@@ -37,10 +33,8 @@ public class LoginActivity extends AppCompatActivity {
         goToRegisterText = findViewById(R.id.goToRegisterTextView);
         radioAdmin = findViewById(R.id.radioAdmin);
 
-        // Handle Login attempt
         loginButton.setOnClickListener(v -> attemptLogin());
 
-        // Handle navigation to Register screen
         goToRegisterText.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -48,42 +42,37 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void attemptLogin() {
-        // Using the validator for the role check
-        //TODO This check needs to be removed and updated when Admin is added.
-        if (!validator.isRoleSelectionValid(radioAdmin.isChecked())) {
-            Toast.makeText(this, "Admin portal is under construction.", Toast.LENGTH_SHORT).show();
+        boolean isAdminChecked = radioAdmin != null && radioAdmin.isChecked();
+        if (!validator.isRoleSelectionValid(isAdminChecked)) {
+            Snackbar.make(findViewById(android.R.id.content),
+                    "Admin portal is under construction.", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        // Using the validator for the email input check
-        String emailError = validator.EmailValidator(email);
+        String emailError = validator.validateEmail(email);
         if (emailError != null) {
             emailEditText.setError(emailError);
             return;
         }
 
-        // Using validator for password input check
-        String passwordError = validator.PasswordValidator(password);
+        String passwordError = validator.validatePassword(password);
         if (passwordError != null) {
             passwordEditText.setError(passwordError);
             return;
         }
 
-
-        // Firebase Sign In
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        // Send to under construction Event List page
+                        Snackbar.make(findViewById(android.R.id.content), "Login Successful", Snackbar.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, EventListActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Login Failed.", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(android.R.id.content), "Login Failed.", Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
