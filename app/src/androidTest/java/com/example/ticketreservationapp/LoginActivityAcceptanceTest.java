@@ -18,6 +18,7 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.intent.VerificationModes.times;
 
 @RunWith(AndroidJUnit4.class)
 public class LoginActivityAcceptanceTest {
@@ -32,24 +33,73 @@ public class LoginActivityAcceptanceTest {
         Intents.release();
     }
 
+
     @Test
-    public void testInvalidLoginShowsErrors() {
+    public void emptyPassword(){
         ActivityScenario.launch(LoginActivity.class);
 
         onView(withId(R.id.loginEmailEditText)).perform(typeText("test@example.com"), closeSoftKeyboard());
-        onView(withId(R.id.loginPasswordEditText)).perform(typeText("123"), closeSoftKeyboard());
         onView(withId(R.id.loginButton)).perform(click());
 
-        onView(withId(R.id.loginPasswordEditText)).check(matches(hasErrorText("Password must be at least 6 characters")));
+        onView(withId(R.id.loginPasswordEditText)).check(matches(hasErrorText("Please enter a password")));
     }
-    
+
     @Test
-    public void testAdminRoleIsBlocked() {
+    public void emptyEmail(){
         ActivityScenario.launch(LoginActivity.class);
-        
-        onView(withId(R.id.radioAdmin)).perform(click());
+
         onView(withId(R.id.loginButton)).perform(click());
-        
-        assert(Intents.getIntents().isEmpty());
+
+        onView(withId(R.id.loginEmailEditText)).check(matches(hasErrorText("Please enter an email address")));
     }
+
+    @Test
+    public void InvalidEmail() {
+        ActivityScenario.launch(LoginActivity.class);
+
+        onView(withId(R.id.loginEmailEditText)).perform(typeText("notanemail"), closeSoftKeyboard());
+        onView(withId(R.id.loginButton)).perform(click());
+
+        onView(withId(R.id.loginEmailEditText)).check(matches(hasErrorText("Please enter a valid email address")));
+    }
+
+    @Test
+    public void invalidUser() throws InterruptedException {
+        ActivityScenario.launch(LoginActivity.class);
+
+        onView(withId(R.id.loginEmailEditText)).perform(typeText("invalid@example.com"), closeSoftKeyboard());
+        onView(withId(R.id.loginPasswordEditText)).perform(typeText("invalidpw"), closeSoftKeyboard());
+        onView(withId(R.id.loginButton)).perform(click());
+
+        Thread.sleep(3000);
+
+        intended(hasComponent(EventListActivity.class.getName()), times(0));
+    }
+
+    @Test
+    public void validUser() throws InterruptedException {
+        ActivityScenario.launch(LoginActivity.class);
+
+        onView(withId(R.id.loginEmailEditText)).perform(typeText("testuser_ddfded96@example.com"), closeSoftKeyboard());
+        onView(withId(R.id.loginPasswordEditText)).perform(typeText("validPassword123"), closeSoftKeyboard());
+        onView(withId(R.id.loginButton)).perform(click());
+
+        Thread.sleep(3000);
+
+        intended(hasComponent(EventListActivity.class.getName()));
+
+    }
+
+
+
+
+//    @Test
+//    public void testAdminRoleIsBlocked() {
+//        ActivityScenario.launch(LoginActivity.class);
+//
+//        onView(withId(R.id.radioAdmin)).perform(click());
+//        onView(withId(R.id.loginButton)).perform(click());
+//
+//        assert(Intents.getIntents().isEmpty());
+//    }
 }

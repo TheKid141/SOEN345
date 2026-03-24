@@ -2,15 +2,21 @@ package com.example.ticketreservationapp;
 
 public class LoginValidator {
 
-    public boolean validateInput(String email, String password) {
-        if (email == null || email.trim().isEmpty()) {
-            return false;
+    public String EmailValidator(String email){
+        if(email == null || email.trim().isEmpty()){
+            return "Please enter an email address";
         }
-        if (password == null || password.trim().isEmpty()) {
-            return false;
+        if(!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")){
+            return "Please enter a valid email address";
         }
-        // Using a standard regex so it can run purely locally on the JVM without Android dependencies
-        return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+        return null;
+    }
+
+    public String PasswordValidator(String password) {
+        if(password == null || password.trim().isEmpty()){
+            return "Please enter a password";
+        }
+        return null;
     }
 
     public boolean isRoleSelectionValid(boolean isAdminSelected) {

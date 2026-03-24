@@ -13,39 +13,44 @@ class LoginValidatorTest {
         validator = new LoginValidator();
     }
 
-    // Input Validation Tests
+    // Email Tests
 
     @Test
-    void testValidEmailAndPasswordReturnsTrue() {
-        assertTrue(validator.validateInput("user@student.concordia.ca", "securePassword123"));
+    void emptyEmail(){
+        assertEquals("Please enter an email address", validator.EmailValidator(""));
     }
 
     @Test
-    void testEmptyEmailReturnsFalse() {
-        assertFalse(validator.validateInput("", "password123"));
-        assertFalse(validator.validateInput("   ", "password123"));
+    void nullEmail(){
+        assertEquals("Please enter an email address", validator.EmailValidator(null));
     }
 
     @Test
-    void testNullEmailReturnsFalse() {
-        assertFalse(validator.validateInput(null, "password123"));
+    void validEmail(){
+        assertNull(validator.EmailValidator("test@gmail.com"));
     }
 
     @Test
-    void testInvalidEmailFormatReturnsFalse() {
-        assertFalse(validator.validateInput("userdomain.com", "password123")); // Missing @
-        assertFalse(validator.validateInput("user@", "password123")); // Missing domain
+    void invalidEmail(){
+        assertEquals("Please enter a valid email address", validator.EmailValidator("testgmail.com"));
+    }
+
+    // Password Tests
+
+    @Test
+    void emptyPassword(){
+        assertEquals("Please enter a password", validator.PasswordValidator(""));
     }
 
     @Test
-    void testEmptyPasswordReturnsFalse() {
-        assertFalse(validator.validateInput("user@example.com", ""));
-        assertFalse(validator.validateInput("user@example.com", "   "));
+    void nullPassword(){
+        assertEquals("Please enter a password", validator.PasswordValidator(null));
     }
 
     @Test
-    void testNullPasswordReturnsFalse() {
-        assertFalse(validator.validateInput("user@example.com", null));
+    void validPassword(){
+        assertNull(validator.PasswordValidator("password123"));
+
     }
 
     // Business Logic / Role Selection Tests

@@ -58,11 +58,20 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        // Using the validator for the input check
-        if (!validator.validateInput(email, password)) {
-            Toast.makeText(this, "Please enter a valid email and password.", Toast.LENGTH_SHORT).show();
+        // Using the validator for the email input check
+        String emailError = validator.EmailValidator(email);
+        if (emailError != null) {
+            emailEditText.setError(emailError);
             return;
         }
+
+        // Using validator for password input check
+        String passwordError = validator.PasswordValidator(password);
+        if (passwordError != null) {
+            passwordEditText.setError(passwordError);
+            return;
+        }
+
 
         // Firebase Sign In
         mAuth.signInWithEmailAndPassword(email, password)
