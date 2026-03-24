@@ -65,17 +65,17 @@ public class InputValidatorTest {
 
     @Test
     void testNullPasswordReturnsError() {
-        assertEquals("Password must be at least 6 characters", validator.validatePassword(null));
+        assertEquals("Please enter a password", validator.validatePassword(null));
     }
 
     @Test
     void testEmptyPasswordReturnsError() {
-        assertEquals("Password must be at least 6 characters", validator.validatePassword(""));
+        assertEquals("Please enter a password", validator.validatePassword(""));
     }
 
     @Test
     void testWhitespacePasswordReturnsError() {
-        assertEquals("Password must be at least 6 characters", validator.validatePassword("     "));
+        assertEquals("Please enter a password", validator.validatePassword("     "));
     }
 
     // --- Boundary Value Analysis Tests ---
