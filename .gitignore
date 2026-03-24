@@ -15,3 +15,6 @@ gen/
 # System files
 .DS_Store
 Thumbs.db
+
+# Secrets for testing
+app/secrets.properties

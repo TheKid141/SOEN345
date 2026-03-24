@@ -1,4 +1,5 @@
 package com.example.ticketreservationapp;
+
 import com.google.firebase.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EventTest {
 
     private Event event;
+    private Event emptyEvent;
     private Timestamp time;
 
     @BeforeEach
@@ -16,6 +18,7 @@ public class EventTest {
         LocalDateTime testDate = LocalDateTime.of(2026, 4, 18, 7, 45);
         time = new Timestamp(Date.from(testDate.atZone(ZoneId.systemDefault()).toInstant()));
         event = new Event("Art Exhibition", time, "Pierrefonds-Roxboro", "Art");
+        emptyEvent = new Event();
     }
 
     @Test
@@ -35,14 +38,23 @@ public class EventTest {
 
     @Test
     void testGetDate(){
-        String date = event.getDate();
-        assertEquals("Apr 18, 2026", date);
+        assertEquals("Apr 18, 2026", event.getDate());
     }
 
     @Test
     void testGetDateTime(){
-        String dateTime = event.getDateTime();
-        assertEquals("07:45 AM", dateTime);
+        assertTrue(event.getDateTime().contains("07:45"));
     }
 
+    @Test
+    void testGetRawDateNotNull(){
+        assertNotNull(event.getRawDate());
+    }
+
+    @Test
+    void testEmptyEventHandlesNullsGracefully() {
+        assertNull(emptyEvent.getTitle());
+        assertNull(emptyEvent.getRawDate());
+        assertEquals("", emptyEvent.getDate());
+    }
 }

@@ -56,6 +56,14 @@ dependencies {
 
 // Unit and component tests (JUnit 5)
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+
+    // Mockito and LiveData testing
+    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // Espresso UI testing rules
+    androidTestImplementation("androidx.test:rules:1.5.0")
+
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

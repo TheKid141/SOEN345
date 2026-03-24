@@ -1,6 +1,7 @@
 package com.example.ticketreservationapp;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +10,10 @@ import android.widget.Button;
 import android.widget.Spinner;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth; // Added for logout
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -25,8 +26,8 @@ public class EventListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private List<Event> fullEventList = new ArrayList<>();
-    private FirebaseFirestore db;
-    private Button btnFilter;
+    private EventViewModel eventViewModel;
+    private Button btnFilter, btnLogout; // Added logout button
 
     private Calendar selectedCalendar = null;
     private String selectedCategory = "All";
@@ -39,26 +40,29 @@ public class EventListActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         btnFilter = findViewById(R.id.btnFilter);
+        btnLogout = findViewById(R.id.btnLogout);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new EventAdapter(new ArrayList<>(fullEventList));
+        adapter = new EventAdapter();
         recyclerView.setAdapter(adapter);
 
-        db = FirebaseFirestore.getInstance();
-        loadEvents();
+        eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
+        eventViewModel.getEvents().observe(this, events -> {
+            fullEventList = events;
+            applyFilters();
+        });
 
         btnFilter.setOnClickListener(v -> showFilterDialog());
-    }
 
-    private void loadEvents() {
-        db.collection("events").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            fullEventList.clear();
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                Event event = doc.toObject(Event.class);
-                fullEventList.add(event);
-            }
-            adapter.updateList(new ArrayList<>(fullEventList));
-        }).addOnFailureListener(Throwable::printStackTrace);
+        // Handle Logout
+        btnLogout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(EventListActivity.this, LoginActivity.class);
+            // Clear the back stack so they can't press back to get into the app
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void showFilterDialog() {
@@ -73,10 +77,10 @@ public class EventListActivity extends AppCompatActivity {
         Button btnApplyFilter = dialogView.findViewById(R.id.btnApplyFilter);
 
         if (selectedCalendar != null) {
-            btnPickDate.setText(String.format("%02d/%02d/%d", 
-                selectedCalendar.get(Calendar.DAY_OF_MONTH), 
-                selectedCalendar.get(Calendar.MONTH) + 1, 
-                selectedCalendar.get(Calendar.YEAR)));
+            btnPickDate.setText(String.format("%02d/%02d/%d",
+                    selectedCalendar.get(Calendar.DAY_OF_MONTH),
+                    selectedCalendar.get(Calendar.MONTH) + 1,
+                    selectedCalendar.get(Calendar.YEAR)));
         }
 
         setupSpinners(spinnerCategory, spinnerLocation);
@@ -100,10 +104,9 @@ public class EventListActivity extends AppCompatActivity {
         });
 
         btnClearFilters.setOnClickListener(v -> {
-
             selectedCalendar = null;
-            
-
+            selectedCategory = "All";
+            selectedLocation = "All";
             btnPickDate.setText("Select Date");
             spinnerCategory.setSelection(0);
             spinnerLocation.setSelection(0);
@@ -150,7 +153,7 @@ public class EventListActivity extends AppCompatActivity {
                 Calendar eventCal = Calendar.getInstance();
                 eventCal.setTime(event.getRawDate());
                 matchesDate = (eventCal.get(Calendar.YEAR) == selectedCalendar.get(Calendar.YEAR) &&
-                               eventCal.get(Calendar.DAY_OF_YEAR) == selectedCalendar.get(Calendar.DAY_OF_YEAR));
+                        eventCal.get(Calendar.DAY_OF_YEAR) == selectedCalendar.get(Calendar.DAY_OF_YEAR));
             }
 
             if (!selectedCategory.equals("All")) {
@@ -165,6 +168,6 @@ public class EventListActivity extends AppCompatActivity {
                 filteredList.add(event);
             }
         }
-        adapter.updateList(filteredList);
+        adapter.submitList(filteredList);
     }
 }
