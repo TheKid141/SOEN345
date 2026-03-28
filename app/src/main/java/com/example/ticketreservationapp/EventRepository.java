@@ -14,10 +14,13 @@ public class EventRepository {
         db.collection("events").get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<Event> events = new ArrayList<>();
             for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                events.add(doc.toObject(Event.class));
+                Event event = doc.toObject(Event.class);
+                event.setEventId(doc.getId());
+                events.add(event);
             }
             data.setValue(events);
         }).addOnFailureListener(Throwable::printStackTrace);
         return data;
     }
+
 }
