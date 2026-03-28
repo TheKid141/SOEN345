@@ -3,33 +3,33 @@ package com.example.ticketreservationapp;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import android.util.Log;
-
 import java.util.Set;
 
 public class EventListActivity extends AppCompatActivity {
@@ -40,49 +40,114 @@ public class EventListActivity extends AppCompatActivity {
     private EventViewModel eventViewModel;
     private ReservationViewModel reservationViewModel;
     private Button btnFilter, btnLogout, btnMyReservations;
+    private FloatingActionButton fabAddEvent;
 
     private Calendar selectedCalendar = null;
     private String selectedCategory = "All";
     private String selectedLocation = "All";
-
-
-    private void loadReservedEventIds() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) return;
-
-        reservationViewModel.getReservationsForUser(currentUser.getUid()).observe(this, reservations -> {
-            Set<String> ids = new HashSet<>();
-            for (Reservation r : reservations) {
-                ids.add(r.getEventId());
-            }
-            adapter.setReservedEventIds(ids);
-        });
-    }
+    private boolean isAdmin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_list);
 
+        isAdmin = getIntent().getBooleanExtra("IS_ADMIN", false);
+
         recyclerView = findViewById(R.id.recyclerView);
         btnFilter = findViewById(R.id.btnFilter);
         btnLogout = findViewById(R.id.btnLogout);
         btnMyReservations = findViewById(R.id.btnMyReservations);
+        fabAddEvent = findViewById(R.id.fabAddEvent);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Pass the reserve listener into the adapter
-        adapter = new EventAdapter(this::handleReserveClick);
-        recyclerView.setAdapter(adapter);
-
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
         reservationViewModel = new ViewModelProvider(this).get(ReservationViewModel.class);
-        loadReservedEventIds();
 
-        eventViewModel.getEvents().observe(this, events -> {
-            fullEventList = events;
-            applyFilters();
+        if (isAdmin) {
+            fabAddEvent.setVisibility(View.VISIBLE);
+            btnMyReservations.setVisibility(View.GONE);
+            fabAddEvent.setOnClickListener(v -> {
+                Intent intent = new Intent(EventListActivity.this, AddEditEventActivity.class);
+                startActivity(intent);
+            });
+        } else {
+            fabAddEvent.setVisibility(View.GONE);
+            btnMyReservations.setVisibility(View.VISIBLE);
+        }
+
+        adapter = new EventAdapter(isAdmin, this::handleReserveClick, new EventAdapter.OnAdminActionClickListener() {
+            @Override
+            public void onEditClick(Event event) {
+                Intent intent = new Intent(EventListActivity.this, AddEditEventActivity.class);
+                intent.putExtra("EVENT_ID", event.getEventId());
+                intent.putExtra("EVENT_TITLE", event.getTitle());
+                intent.putExtra("EVENT_LOCATION", event.getLocation());
+                intent.putExtra("EVENT_CATEGORY", event.getCategory());
+                intent.putExtra("EVENT_TIMESTAMP", event.getRawDate() != null ? event.getRawDate().getTime() : -1);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onCancelEventClick(Event event) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(EventListActivity.this);
+                View view = LayoutInflater.from(EventListActivity.this).inflate(R.layout.dialog_manage_event, null);
+                builder.setView(view);
+                AlertDialog dialog = builder.create();
+
+                TextView tvTitle = view.findViewById(R.id.tvManageDialogTitle);
+                Button btnSuspend = view.findViewById(R.id.btnSuspendEvent);
+                Button btnRestore = view.findViewById(R.id.btnRestoreEvent);
+                Button btnDelete = view.findViewById(R.id.btnDeleteEvent);
+
+                tvTitle.setText(getString(R.string.title_manage_event, event.getTitle()));
+
+                if ("cancelled".equals(event.getStatus())) {
+                    btnSuspend.setVisibility(View.GONE);
+                    btnRestore.setVisibility(View.VISIBLE);
+                } else {
+                    btnSuspend.setVisibility(View.VISIBLE);
+                    btnRestore.setVisibility(View.GONE);
+                }
+
+                btnSuspend.setOnClickListener(v -> {
+                    eventViewModel.cancelEvent(event.getEventId(), success -> {
+                        if(success) Snackbar.make(findViewById(android.R.id.content), getString(R.string.snackbar_suspended), Snackbar.LENGTH_SHORT).show();
+                    });
+                    dialog.dismiss();
+                });
+
+                btnRestore.setOnClickListener(v -> {
+                    eventViewModel.restoreEvent(event.getEventId(), success -> {
+                        if(success) Snackbar.make(findViewById(android.R.id.content), getString(R.string.snackbar_restored), Snackbar.LENGTH_SHORT).show();
+                    });
+                    dialog.dismiss();
+                });
+
+                btnDelete.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    new AlertDialog.Builder(EventListActivity.this)
+                            .setTitle(getString(R.string.title_permanent_delete))
+                            .setMessage(getString(R.string.msg_permanent_delete))
+                            .setPositiveButton("Delete", (d, w) -> {
+                                eventViewModel.deleteEvent(event.getEventId(), success -> {
+                                    if(success) Snackbar.make(findViewById(android.R.id.content), getString(R.string.snackbar_deleted), Snackbar.LENGTH_SHORT).show();
+                                });
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                });
+                dialog.show();
+            }
         });
+
+        recyclerView.setAdapter(adapter);
+
+        // Initial Data Load
+        loadEvents();
+        if (!isAdmin) {
+            loadReservedEventIds();
+        }
 
         btnFilter.setOnClickListener(v -> showFilterDialog());
 
@@ -100,17 +165,32 @@ public class EventListActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Refresh the reserved event IDs every time this screen becomes active again
-        loadReservedEventIds();
+    private void loadEvents() {
+        eventViewModel.getEvents().observe(this, events -> {
+            fullEventList = events;
+            applyFilters();
+        });
     }
 
-    /**
-     * Called when the user taps "Reserve Ticket" on an event card.
-     * First checks if they already have an active reservation for this event.
-     */
+    private void loadReservedEventIds() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
+
+        reservationViewModel.getReservationsForUser(currentUser.getUid()).observe(this, reservations -> {
+            if (reservations == null) return;
+
+            Set<String> ids = new HashSet<>();
+            for (Reservation r : reservations) {
+                if (r.getEventId() != null) {
+                    ids.add(r.getEventId());
+                }
+            }
+
+            // This forces the adapter to wait until the UI is ready before updating buttons
+            recyclerView.post(() -> adapter.setReservedEventIds(ids));
+        });
+    }
+
     private void handleReserveClick(Event event) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) return;
@@ -133,14 +213,13 @@ public class EventListActivity extends AppCompatActivity {
                 .setTitle("Reserve Ticket")
                 .setMessage("Reserve a ticket for \"" + event.getTitle() + "\"?")
                 .setPositiveButton("Reserve", (dialog, which) -> {
-                    Reservation reservation = new Reservation(userId, eventId, event.getTitle(), event.getTimestamp(), event.getLocation(), event.getCategory());
+                    Reservation reservation = new Reservation(userId, eventId, event.getTitle(), event.getDate(), event.getLocation(), event.getCategory());
                     reservationViewModel.createReservation(reservation, (success, id) -> {
                         if (success) {
-                            loadReservedEventIds();
                             sendConfirmationEmail(
                                     currentUser.getEmail(),
                                     event.getTitle(),
-                                    event.getDate() + " @ " + event.getDateTime(),
+                                    event.getFormattedDate() + " @ " + event.getDateTime(),
                                     event.getLocation(),
                                     id
                             );
@@ -310,11 +389,6 @@ public class EventListActivity extends AppCompatActivity {
                     runOnUiThread(() -> Snackbar.make(findViewById(android.R.id.content),
                             "Reservation confirmed but email failed to send.",
                             Snackbar.LENGTH_SHORT).show());
-//                    runOnUiThread(() ->
-//                            Snackbar.make(findViewById(android.R.id.content),
-//                                    "Reservation confirmed but email failed to send.",
-//                                    Snackbar.LENGTH_SHORT).show()
-//                    );
                 }
                 conn.disconnect();
             } catch (Exception e) {
@@ -322,5 +396,4 @@ public class EventListActivity extends AppCompatActivity {
             }
         }).start();
     }
-
 }

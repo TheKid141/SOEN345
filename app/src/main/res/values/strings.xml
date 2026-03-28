@@ -3,4 +3,20 @@
     <string name="event_date_format">📅 %1$s @ %2$s</string>
     <string name="event_location_format">📍 %1$s</string>
     <string name="event_category_format">🏷️ %1$s</string>
+
+    <string name="menu_suspend">🛑 Cancel Event (Hide from users)</string>
+    <string name="menu_restore">✅ Restore Event (Make visible again)</string>
+    <string name="menu_delete_hard">🗑️ Delete Permanently (Cannot be undone)</string>
+
+    <string name="title_manage_event">Manage Event: %1$s</string>
+    <string name="title_permanent_delete">Permanent Delete</string>
+    <string name="msg_permanent_delete">Are you absolutely sure? This will wipe the event from the database.</string>
+
+    <string name="snackbar_suspended">Event Cancelled.</string>
+    <string name="snackbar_restored">Event restored.</string>
+    <string name="snackbar_deleted">Event permanently deleted.</string>
+
+    <string name="tag_cancelled">(CANCELLED)</string>
+    <string name="btn_manage">Manage</string>
+    <string name="btn_edit">Edit</string>
 </resources>

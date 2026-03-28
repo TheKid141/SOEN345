@@ -23,4 +23,25 @@ public class EventViewModel extends ViewModel {
     public LiveData<List<Event>> getEvents() {
         return eventsLiveData;
     }
+
+    //For Admin Portal
+    public void addEvent(Event event, EventRepository.ActionCallback callback) {
+        repository.addEvent(event, callback);
+    }
+
+    public void updateEvent(String eventId, Event event, EventRepository.ActionCallback callback) {
+        repository.updateEvent(eventId, event, callback);
+    }
+
+    public void cancelEvent(String eventId, EventRepository.ActionCallback callback) {
+        repository.cancelEvent(eventId, callback);
+    }
+
+    public void restoreEvent(String eventId, EventRepository.ActionCallback callback) {
+        repository.restoreEvent(eventId, callback);
+    }
+
+    public void deleteEvent(String eventId, EventRepository.ActionCallback callback) {
+        repository.deleteEvent(eventId, callback);
+    }
 }

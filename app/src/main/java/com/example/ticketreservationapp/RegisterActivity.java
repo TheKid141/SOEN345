@@ -57,6 +57,8 @@ public class RegisterActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Snackbar.make(findViewById(android.R.id.content), "Registration Successful.", Snackbar.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, EventListActivity.class);
+                        // Force the user to be a customer, preventing privilege escalation
+                        intent.putExtra("IS_ADMIN", false);
                         startActivity(intent);
                         finish();
                     } else {
