@@ -10,8 +10,12 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolder> {
+
+    private Set<String> reservedEventIds = new HashSet<>();
 
     public interface OnReserveClickListener {
         void onReserveClick(Event event);
@@ -42,6 +46,12 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
                 }
             };
 
+
+    public void setReservedEventIds(Set<String> ids) {
+        reservedEventIds = ids;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -57,10 +67,18 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
         holder.tvLocation.setText(holder.itemView.getContext().getString(R.string.event_location_format, event.getLocation()));
         holder.tvCategory.setText(holder.itemView.getContext().getString(R.string.event_category_format, event.getCategory()));
 
-        // ✅ Wire up the reserve button
         if (reserveListener != null) {
             holder.btnReserve.setVisibility(View.VISIBLE);
-            holder.btnReserve.setOnClickListener(v -> reserveListener.onReserveClick(event));
+            if (reservedEventIds.contains(event.getEventId())) {
+                holder.btnReserve.setText("Reserved");
+                holder.btnReserve.setEnabled(false);
+                holder.btnReserve.setAlpha(0.5f);
+            } else {
+                holder.btnReserve.setText("Reserve Ticket");
+                holder.btnReserve.setEnabled(true);
+                holder.btnReserve.setAlpha(1.0f);
+                holder.btnReserve.setOnClickListener(v -> reserveListener.onReserveClick(event));
+            }
         } else {
             holder.btnReserve.setVisibility(View.GONE);
         }

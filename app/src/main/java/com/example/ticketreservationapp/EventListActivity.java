@@ -30,6 +30,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import android.util.Log;
 
+import java.util.Set;
+
 public class EventListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -42,6 +44,20 @@ public class EventListActivity extends AppCompatActivity {
     private Calendar selectedCalendar = null;
     private String selectedCategory = "All";
     private String selectedLocation = "All";
+
+
+    private void loadReservedEventIds() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
+
+        reservationViewModel.getReservationsForUser(currentUser.getUid()).observe(this, reservations -> {
+            Set<String> ids = new HashSet<>();
+            for (Reservation r : reservations) {
+                ids.add(r.getEventId());
+            }
+            adapter.setReservedEventIds(ids);
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +77,7 @@ public class EventListActivity extends AppCompatActivity {
 
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
         reservationViewModel = new ViewModelProvider(this).get(ReservationViewModel.class);
+        loadReservedEventIds();
 
         eventViewModel.getEvents().observe(this, events -> {
             fullEventList = events;
@@ -112,6 +129,7 @@ public class EventListActivity extends AppCompatActivity {
                     Reservation reservation = new Reservation(userId, eventId, event.getTitle(), event.getTimestamp(), event.getLocation(), event.getCategory());
                     reservationViewModel.createReservation(reservation, (success, id) -> {
                         if (success) {
+                            loadReservedEventIds();
                             sendConfirmationEmail(
                                     currentUser.getEmail(),
                                     event.getTitle(),
