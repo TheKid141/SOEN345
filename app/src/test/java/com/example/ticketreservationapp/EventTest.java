@@ -38,7 +38,7 @@ public class EventTest {
 
     @Test
     void testGetDate(){
-        assertEquals("Apr 18, 2026", event.getDate());
+        assertEquals("Apr 18, 2026", event.getFormattedDate());
     }
 
     @Test
@@ -55,6 +55,6 @@ public class EventTest {
     void testEmptyEventHandlesNullsGracefully() {
         assertNull(emptyEvent.getTitle());
         assertNull(emptyEvent.getRawDate());
-        assertEquals("", emptyEvent.getDate());
+        assertEquals("", emptyEvent.getFormattedDate());
     }
 }
