@@ -100,6 +100,13 @@ public class EventListActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the reserved event IDs every time this screen becomes active again
+        loadReservedEventIds();
+    }
+
     /**
      * Called when the user taps "Reserve Ticket" on an event card.
      * First checks if they already have an active reservation for this event.
