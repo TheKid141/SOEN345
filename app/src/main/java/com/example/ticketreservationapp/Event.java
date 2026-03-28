@@ -10,6 +10,7 @@ public class Event {
     private Timestamp Date;
     private String Location;
     private String Category;
+    private String eventId;
 
     public Event() {}
 
@@ -47,6 +48,10 @@ public class Event {
     public String getCategory() {
         return Category;
     }
+
+    public void setEventId(String eventId) { this.eventId = eventId; }
+
+    public String getEventId() { return eventId; }
 
     public String formatDate(Timestamp date, String type){
         if(date == null){
