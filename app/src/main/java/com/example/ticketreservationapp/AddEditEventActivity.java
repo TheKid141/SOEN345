@@ -41,6 +41,9 @@ public class AddEditEventActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSaveEvent);
         tvHeader = findViewById(R.id.tvAdminTitle);
 
+        android.widget.ImageButton btnBack = findViewById(R.id.btnBackFromAddEdit);
+        btnBack.setOnClickListener(v -> finish());
+
         // Date Picker Dialog
         btnPickDate.setOnClickListener(v -> {
             new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
