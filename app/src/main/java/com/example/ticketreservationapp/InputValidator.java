@@ -25,6 +25,6 @@ public class InputValidator {
     }
 
     public boolean isRoleSelectionValid(boolean isAdminSelected) {
-        return !isAdminSelected;
+        return true;
     }
 }

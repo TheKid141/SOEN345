@@ -38,7 +38,17 @@
             android:textSize="14sp"
             android:textColor="#888888"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btnReserve"
@@ -46,6 +56,29 @@
             android:layout_height="wrap_content"
             android:text="Reserve Ticket"
             android:textAllCaps="false"/>
+
+        <LinearLayout
+            android:id="@+id/adminControlsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnEditEvent"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit" />
+
+            <Button
+                android:id="@+id/btnCancelEvent"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF0000"
+                android:text="Cancel Event" />
+        </LinearLayout>
 
     </LinearLayout>
 

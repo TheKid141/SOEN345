@@ -1,6 +1,5 @@
 package com.example.ticketreservationapp;
 
-
 import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,20 +17,23 @@ public class ReservationRepository {
         db.collection(COLLECTION)
                 .whereEqualTo("userId", userId)
                 .whereEqualTo("status", "active")
-                .get()
-                .addOnSuccessListener(snapshots -> {
-                    List<Reservation> list = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snapshots) {
-                        Reservation r = doc.toObject(Reservation.class);
-                        r.setReservationId(doc.getId());
-                        list.add(r);
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        e.printStackTrace();
+                        return;
                     }
-                    data.setValue(list);
-                })
-                .addOnFailureListener(Throwable::printStackTrace);
+                    if (snapshots != null) {
+                        List<Reservation> list = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            Reservation r = doc.toObject(Reservation.class);
+                            r.setReservationId(doc.getId());
+                            list.add(r);
+                        }
+                        data.setValue(list);
+                    }
+                });
         return data;
     }
-
 
     public void createReservation(Reservation reservation, ReservationCallback callback) {
         DocumentReference ref = db.collection(COLLECTION).document();
@@ -74,5 +76,4 @@ public class ReservationRepository {
     public interface ExistsCallback {
         void onResult(boolean exists);
     }
-
 }

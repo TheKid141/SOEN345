@@ -42,17 +42,28 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void attemptLogin() {
+        String inputId = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
         boolean isAdminChecked = radioAdmin != null && radioAdmin.isChecked();
-        if (!validator.isRoleSelectionValid(isAdminChecked)) {
-            Snackbar.make(findViewById(android.R.id.content),
-                    "Admin portal is under construction.", Snackbar.LENGTH_SHORT).show();
-            return;
+
+        // --- ADMIN FLOW (Hardcoded) ---
+        if (isAdminChecked) {
+            if (inputId.equals("admin") && password.equals("admin123")) {
+                Snackbar.make(findViewById(android.R.id.content), "Admin Login Successful", Snackbar.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, EventListActivity.class);
+                intent.putExtra("IS_ADMIN", true); // Grant Admin Privileges
+                startActivity(intent);
+                finish();
+            } else {
+                Snackbar.make(findViewById(android.R.id.content), "Invalid Admin Credentials", Snackbar.LENGTH_LONG).show();
+            }
+            return; // Stop here, do not attempt Firebase login
         }
 
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
+        // --- CUSTOMER FLOW (Firebase Auth) ---
 
-        String emailError = validator.validateEmail(email);
+        // Validate inputs for Firebase standard users
+        String emailError = validator.validateEmail(inputId);
         if (emailError != null) {
             emailEditText.setError(emailError);
             return;
@@ -64,11 +75,12 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        mAuth.signInWithEmailAndPassword(email, password)
+        mAuth.signInWithEmailAndPassword(inputId, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         Snackbar.make(findViewById(android.R.id.content), "Login Successful", Snackbar.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, EventListActivity.class);
+                        intent.putExtra("IS_ADMIN", false); // Strictly deny Admin Privileges
                         startActivity(intent);
                         finish();
                     } else {

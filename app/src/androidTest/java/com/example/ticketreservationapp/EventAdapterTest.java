@@ -24,13 +24,12 @@ public class EventAdapterTest {
 
         Event event1 = new Event("Music Festival", time1, "DDO", "Music");
         events = Arrays.asList(event1);
-
-        adapter = new EventAdapter();
+        adapter = new EventAdapter(false, null, null);
         adapter.submitList(events);
     }
 
     @Test
     public void getCount(){
-        assertEquals(1, events.size());
+        assertEquals(1, adapter.getItemCount());
     }
 }
