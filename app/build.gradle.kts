@@ -60,6 +60,13 @@ dependencies {
     // Mockito and LiveData testing
     testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
+    
+    // Robolectric and AndroidX Test Core for Unit Testing UI components
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+
+    // Ensure JUnit 4 tests (like Robolectric) run on the JUnit 5 Platform
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.1")
 
     // Espresso UI testing rules
     androidTestImplementation("androidx.test:rules:1.5.0")
