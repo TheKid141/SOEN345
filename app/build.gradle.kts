@@ -48,6 +48,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 
 // Functional and acceptance tests (Espresso)
     androidTestImplementation(libs.ext.junit)
