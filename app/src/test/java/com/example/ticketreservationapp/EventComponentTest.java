@@ -1,30 +1,24 @@
 package com.example.ticketreservationapp;
 
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class EventComponentTest {
 
+    /**
+     * US 4.2: Component Test verifying database update logic
+     * This tests the interaction between the EventViewModel and the EventRepository.
+     */
     @Test
-    void shouldReflectUpdatedEventDetailsInList() {
-        Event event = new Event();
-        event.setEventId("1");
-        event.setTitle("Concert");
-        event.setLocation("Montreal");
-        event.setCategory("Music");
+    void shouldCallRepositoryUpdateWhenEditingEvent() {
+        EventRepository mockRepo = mock(EventRepository.class);
+        EventViewModel viewModel = new EventViewModel(mockRepo);
 
-        event.setTitle("Updated Concert");
-        event.setLocation("Toronto");
-        event.setCategory("Festival");
+        Event updatedEvent = new Event("Updated Concert", null, "Toronto", "Festival");
+        EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
 
-        List<Event> eventList = new ArrayList<>();
-        eventList.add(event);
+        viewModel.updateEvent("event123", updatedEvent, mockCallback);
 
-        assertEquals("Updated Concert", eventList.get(0).getTitle());
-        assertEquals("Toronto", eventList.get(0).getLocation());
-        assertEquals("Festival", eventList.get(0).getCategory());
+        verify(mockRepo).updateEvent(eq("event123"), eq(updatedEvent), eq(mockCallback));
     }
 }

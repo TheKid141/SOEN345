@@ -27,4 +27,12 @@ public class InputValidator {
     public boolean isRoleSelectionValid(boolean isAdminSelected) {
         return true;
     }
+
+    public boolean isEventInputValid(String title, String location, String category, boolean isDateSelected, boolean isTimeSelected) {
+        return title != null && !title.trim().isEmpty()
+                && location != null && !location.trim().isEmpty()
+                && category != null && !category.trim().isEmpty()
+                && isDateSelected
+                && isTimeSelected;
+    }
 }

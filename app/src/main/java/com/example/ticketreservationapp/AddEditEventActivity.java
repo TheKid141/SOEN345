@@ -25,6 +25,7 @@ public class AddEditEventActivity extends AppCompatActivity {
     private Calendar eventCalendar = Calendar.getInstance();
     private boolean isDateSelected = false;
     private boolean isTimeSelected = false;
+    private InputValidator validator = new InputValidator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,14 +100,9 @@ public class AddEditEventActivity extends AppCompatActivity {
         String location = etLocation.getText().toString().trim();
         String category = etCategory.getText().toString().trim();
 
-        if (title.isEmpty() || location.isEmpty() || category.isEmpty()) {
-            Snackbar.make(findViewById(android.R.id.content), "Please fill all text fields", Snackbar.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Validate that Date and Time were picked
-        if (!isDateSelected || !isTimeSelected) {
-            Snackbar.make(findViewById(android.R.id.content), "Please select both a Date and a Time", Snackbar.LENGTH_SHORT).show();
+        // Use the InputValidator so it can be Unit Tested
+        if (!validator.isEventInputValid(title, location, category, isDateSelected, isTimeSelected)) {
+            Snackbar.make(findViewById(android.R.id.content), "Please fill all fields and select Date & Time", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
