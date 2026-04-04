@@ -84,13 +84,17 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
         holder.tvLocation.setText(context.getString(R.string.event_location_format, event.getLocation()));
         holder.tvCategory.setText(context.getString(R.string.event_category_format, event.getCategory()));
 
+        boolean isSuspended = "cancelled".equals(event.getStatus());
+        boolean isSoldOut   = event.isSoldOut();
+
         if (holder.tvCapacity != null) {
-            if (event.getCapacity() > 0) {
+            if (event.getCapacity() > 0 && !isSuspended) {
                 holder.tvCapacity.setVisibility(View.VISIBLE);
                 int available = event.getAvailableTickets();
                 holder.tvCapacity.setText(context.getString(
                         R.string.event_capacity_format, available, event.getCapacity()));
-                if (event.isSoldOut()) {
+
+                if (isSoldOut) {
                     holder.tvCapacity.setTextColor(Color.RED);
                 } else if (available <= Math.max(1, event.getCapacity() / 10)) {
                     holder.tvCapacity.setTextColor(Color.parseColor("#E65100")); // orange warning
@@ -101,12 +105,6 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
                 holder.tvCapacity.setVisibility(View.GONE);
             }
         }
-
-
-
-
-        boolean isSuspended = "cancelled".equals(event.getStatus());
-        boolean isSoldOut   = event.isSoldOut();
 
         if (isAdmin) {
             holder.btnReserve.setVisibility(View.GONE);
@@ -131,7 +129,6 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
                 });
             }
         } else {
-            // --- Customer View ---
             if (holder.adminControlsLayout != null) holder.adminControlsLayout.setVisibility(View.GONE);
             holder.tvStatus.setVisibility(View.GONE);
             holder.btnReserve.setVisibility(View.VISIBLE);

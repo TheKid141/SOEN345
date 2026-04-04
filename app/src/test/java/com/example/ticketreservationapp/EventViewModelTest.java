@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
@@ -59,5 +60,69 @@ public class EventViewModelTest {
         assertEquals("Fake Event", result.get(0).getTitle());
 
         verify(mockRepository, times(1)).getEvents();
+    }
+
+    @Test
+    void testUpdateEvent_Success() {
+        Event updatedEvent = new Event("Updated", null, "Tor", "Art");
+        EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
+
+        viewModel.updateEvent("e123", updatedEvent, mockCallback);
+
+        ArgumentCaptor<EventRepository.ActionCallback> captor = ArgumentCaptor.forClass(EventRepository.ActionCallback.class);
+        verify(mockRepository).updateEvent(eq("e123"), eq(updatedEvent), captor.capture());
+
+        captor.getValue().onResult(true);
+        verify(mockCallback).onResult(true);
+    }
+
+    @Test
+    void testAddEvent_Success() {
+        Event newEvent = new Event("New", null, "MTL", "Music");
+        EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
+
+        viewModel.addEvent(newEvent, mockCallback);
+
+        ArgumentCaptor<EventRepository.ActionCallback> captor = ArgumentCaptor.forClass(EventRepository.ActionCallback.class);
+        verify(mockRepository).addEvent(eq(newEvent), captor.capture());
+
+        captor.getValue().onResult(true);
+        verify(mockCallback).onResult(true);
+    }
+
+    @Test
+    void testDeleteEvent_Success() {
+        EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
+        viewModel.deleteEvent("e123", mockCallback);
+
+        ArgumentCaptor<EventRepository.ActionCallback> captor = ArgumentCaptor.forClass(EventRepository.ActionCallback.class);
+        verify(mockRepository).deleteEvent(eq("e123"), captor.capture());
+
+        captor.getValue().onResult(true);
+        verify(mockCallback).onResult(true);
+    }
+
+    @Test
+    void testCancelEvent_Success() {
+        EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
+        viewModel.cancelEvent("e123", mockCallback);
+
+        ArgumentCaptor<EventRepository.ActionCallback> captor = ArgumentCaptor.forClass(EventRepository.ActionCallback.class);
+        verify(mockRepository).cancelEvent(eq("e123"), captor.capture());
+
+        captor.getValue().onResult(true);
+        verify(mockCallback).onResult(true);
+    }
+
+    @Test
+    void testRestoreEvent_Success() {
+        EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
+        viewModel.restoreEvent("e123", mockCallback);
+
+        ArgumentCaptor<EventRepository.ActionCallback> captor = ArgumentCaptor.forClass(EventRepository.ActionCallback.class);
+        verify(mockRepository).restoreEvent(eq("e123"), captor.capture());
+
+        captor.getValue().onResult(true);
+        verify(mockCallback).onResult(true);
     }
 }

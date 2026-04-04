@@ -116,4 +116,19 @@ public class ReservationViewModelTest {
         List<Reservation> result = viewModel.getReservationsForUser(null).getValue();
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void testCreateReservation_Success() {
+        Reservation newRes = new Reservation("u1", "e1", "Gala", null, "MTL", "Social");
+        ReservationRepository.ReservationCallback mockCallback = mock(ReservationRepository.ReservationCallback.class);
+
+        viewModel.createReservation(newRes, mockCallback);
+
+        ArgumentCaptor<ReservationRepository.ReservationCallback> captor =
+                ArgumentCaptor.forClass(ReservationRepository.ReservationCallback.class);
+        verify(mockRepository).createReservation(eq(newRes), captor.capture());
+
+        captor.getValue().onResult(true, "res123");
+        verify(mockCallback).onResult(true, "res123");
+    }
 }

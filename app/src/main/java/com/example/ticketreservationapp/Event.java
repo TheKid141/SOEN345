@@ -59,7 +59,9 @@ public class Event {
     public int getCapacity() { return capacity; }
     public void setCapacity(int capacity) { this.capacity = capacity; }
 
-    public int getTicketsBooked() { return ticketsBooked; }
+    public int getTicketsBooked() {
+        return Math.max(0, ticketsBooked);
+    }
     public void setTicketsBooked(int ticketsBooked) { this.ticketsBooked = ticketsBooked; }
 
     @Exclude

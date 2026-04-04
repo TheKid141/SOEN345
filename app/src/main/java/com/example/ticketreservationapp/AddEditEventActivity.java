@@ -109,31 +109,21 @@ public class AddEditEventActivity extends AppCompatActivity {
         String title = etTitle.getText().toString().trim();
         String location = etLocation.getText().toString().trim();
         String category = etCategory.getText().toString().trim();
-        String capStr   = etCapacity.getText().toString().trim();
+        String capStr = etCapacity.getText().toString().trim();
 
-        // Use the InputValidator so it can be Unit Tested
+        // Validate the basic event details
         if (!validator.isEventInputValid(title, location, category, isDateSelected, isTimeSelected)) {
             Snackbar.make(findViewById(android.R.id.content), "Please fill all fields and select Date & Time", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
-        int capacity = 0;
-        if (!TextUtils.isEmpty(capStr)) {
-            try {
-                capacity = Integer.parseInt(capStr);
-                if (capacity < 1) {
-                    etCapacity.setError("Capacity must be at least 1");
-                    return;
-                }
-                if (editEventId != null && existingTicketsBooked > 0 && capacity < existingTicketsBooked) {
-                    etCapacity.setError("Capacity cannot be less than tickets already booked");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                etCapacity.setError("Enter a valid whole number");
-                return;
-            }
+        String capacityError = validator.validateCapacity(capStr, existingTicketsBooked);
+        if (capacityError != null) {
+            etCapacity.setError(capacityError);
+            return;
         }
+
+        int capacity = capStr.isEmpty() ? 0 : Integer.parseInt(capStr);
 
         // Convert our Calendar into a Firebase Timestamp
         Timestamp firebaseTimestamp = new Timestamp(eventCalendar.getTime());
@@ -144,12 +134,11 @@ public class AddEditEventActivity extends AppCompatActivity {
         event.setTicketsBooked(existingTicketsBooked);
 
         if (editEventId == null) {
-            // Add
+            // Add new even
             eventViewModel.addEvent(event, success -> {
                 if(success) finish();
             });
         } else {
-            // Edit
             eventViewModel.updateEvent(editEventId, event, success -> {
                 if(success) finish();
             });
