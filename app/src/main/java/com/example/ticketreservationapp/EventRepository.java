@@ -1,8 +1,12 @@
 package com.example.ticketreservationapp;
 
 import androidx.lifecycle.MutableLiveData;
+
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +38,32 @@ public class EventRepository {
     }
 
     public void deleteEvent(String eventId, ActionCallback callback) {
-        db.collection("events").document(eventId).delete()
-                .addOnSuccessListener(aVoid -> callback.onResult(true))
-                .addOnFailureListener(e -> callback.onResult(false));
+        db.collection("reservations")
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    WriteBatch batch = db.batch();
+
+                    DocumentReference eventRef = db.collection("events").document(eventId);
+                    batch.delete(eventRef);
+
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        batch.delete(doc.getReference());
+                    }
+
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> callback.onResult(true))
+                            .addOnFailureListener(e -> {
+                                e.printStackTrace();
+                                callback.onResult(false);
+                            });
+
+                })
+                .addOnFailureListener(e -> {
+                    e.printStackTrace();
+                    callback.onResult(false);
+                });
     }
 
     public void addEvent(Event event, ActionCallback callback) {
