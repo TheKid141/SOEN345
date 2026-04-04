@@ -3,7 +3,9 @@ package com.example.ticketreservationapp;
 import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +38,33 @@ public class ReservationRepository {
     }
 
     public void createReservation(Reservation reservation, ReservationCallback callback) {
-        DocumentReference ref = db.collection(COLLECTION).document();
-        reservation.setReservationId(ref.getId());
-        ref.set(reservation)
-                .addOnSuccessListener(unused -> callback.onResult(true, ref.getId()))
+        DocumentReference reservationRef = db.collection(COLLECTION).document();
+        DocumentReference eventRef = db.collection("events").document(reservation.getEventId());
+        reservation.setReservationId(reservationRef.getId());
+
+        db.runTransaction((Transaction.Function<Void>) transaction -> {
+            DocumentSnapshot eventSnapshot = transaction.get(eventRef);
+            if (!eventSnapshot.exists()) {
+                throw new IllegalStateException("Event not found");
+            }
+
+            Event event = eventSnapshot.toObject(Event.class);
+            if (event == null) {
+                throw new IllegalStateException("Event not found");
+            }
+
+            if ("cancelled".equals(event.getStatus())) {
+                throw new IllegalStateException("Event is cancelled");
+            }
+
+            if (event.isSoldOut()) {
+                throw new IllegalStateException("Event is sold out");
+            }
+
+            transaction.set(reservationRef, reservation);
+            transaction.update(eventRef, "ticketsBooked", event.getTicketsBooked() + 1);
+            return null;
+        }).addOnSuccessListener(unused -> callback.onResult(true, reservationRef.getId()))
                 .addOnFailureListener(e -> {
                     e.printStackTrace();
                     callback.onResult(false, null);
@@ -47,9 +72,38 @@ public class ReservationRepository {
     }
 
     public void cancelReservation(String reservationId, ReservationCallback callback) {
-        db.collection(COLLECTION).document(reservationId)
-                .update("status", "cancelled")
-                .addOnSuccessListener(unused -> callback.onResult(true, reservationId))
+        DocumentReference reservationRef = db.collection(COLLECTION).document(reservationId);
+
+        db.runTransaction((Transaction.Function<Void>) transaction -> {
+            DocumentSnapshot reservationSnapshot = transaction.get(reservationRef);
+            if (!reservationSnapshot.exists()) {
+                throw new IllegalStateException("Reservation not found");
+            }
+
+            Reservation reservation = reservationSnapshot.toObject(Reservation.class);
+            if (reservation == null) {
+                throw new IllegalStateException("Reservation not found");
+            }
+
+            if ("cancelled".equals(reservation.getStatus())) {
+                return null;
+            }
+
+            String eventId = reservation.getEventId();
+            if (eventId != null && !eventId.trim().isEmpty()) {
+                DocumentReference eventRef = db.collection("events").document(eventId);
+                DocumentSnapshot eventSnapshot = transaction.get(eventRef);
+                if (eventSnapshot.exists()) {
+                    Event event = eventSnapshot.toObject(Event.class);
+                    if (event != null) {
+                        transaction.update(eventRef, "ticketsBooked", Math.max(0, event.getTicketsBooked() - 1));
+                    }
+                }
+            }
+
+            transaction.update(reservationRef, "status", "cancelled");
+            return null;
+        }).addOnSuccessListener(unused -> callback.onResult(true, reservationId))
                 .addOnFailureListener(e -> {
                     e.printStackTrace();
                     callback.onResult(false, null);

@@ -41,7 +41,6 @@ public class EventListActivity extends AppCompatActivity {
     private ReservationViewModel reservationViewModel;
     private Button btnFilter, btnLogout, btnMyReservations;
     private FloatingActionButton fabAddEvent;
-
     private Calendar selectedCalendar = null;
     private String selectedCategory = "All";
     private String selectedLocation = "All";
@@ -84,6 +83,9 @@ public class EventListActivity extends AppCompatActivity {
                 intent.putExtra("EVENT_TITLE", event.getTitle());
                 intent.putExtra("EVENT_LOCATION", event.getLocation());
                 intent.putExtra("EVENT_CATEGORY", event.getCategory());
+                intent.putExtra("EVENT_CAPACITY",  event.getCapacity());
+                intent.putExtra("EVENT_STATUS", event.getStatus());
+                intent.putExtra("EVENT_TICKETS_BOOKED", event.getTicketsBooked());
                 intent.putExtra("EVENT_TIMESTAMP", event.getRawDate() != null ? event.getRawDate().getTime() : -1);
                 startActivity(intent);
             }
