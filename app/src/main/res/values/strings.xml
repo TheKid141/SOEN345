@@ -3,6 +3,7 @@
     <string name="event_date_format">📅 %1$s @ %2$s</string>
     <string name="event_location_format">📍 %1$s</string>
     <string name="event_category_format">🏷️ %1$s</string>
+    <string name="event_capacity_format">🎟️ %1$d / %2$d tickets left</string>
 
     <string name="menu_suspend">🛑 Cancel Event (Hide from users)</string>
     <string name="menu_restore">✅ Restore Event (Make visible again)</string>

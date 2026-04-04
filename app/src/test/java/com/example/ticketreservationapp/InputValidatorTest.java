@@ -102,4 +102,26 @@ public class InputValidatorTest {
     void shouldFailWhenEventTimeIsNotSelected() {
         assertFalse(validator.isEventInputValid("Concert", "Montreal", "Music", true, false));
     }
+
+    // Capacity Tests
+    @Test
+    void testValidCapacityReturnsNull() {
+        assertNull(validator.validateCapacity("100", 50));
+    }
+
+    @Test
+    void testCapacityLessThanOneReturnsError() {
+        assertEquals("Capacity must be at least 1", validator.validateCapacity("0", 0));
+        assertEquals("Capacity must be at least 1", validator.validateCapacity("-5", 0));
+    }
+
+    @Test
+    void testCapacityNotANumberReturnsError() {
+        assertEquals("Enter a valid whole number", validator.validateCapacity("abc", 0));
+    }
+
+    @Test
+    void testCapacityLessThanExistingBookingsReturnsError() {
+        assertEquals("Capacity cannot be less than tickets already booked", validator.validateCapacity("50", 60));
+    }
 }

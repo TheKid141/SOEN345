@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
@@ -61,5 +62,19 @@ public class ReservationAdapterTest {
         assertEquals("Test Gala", holder.tvTitle.getText().toString());
         assertEquals("📍 Montreal", holder.tvLocation.getText().toString());
         assertEquals("🏷️ Social", holder.tvCategory.getText().toString());
+    }
+
+    @Test
+    public void testCancelReservationButtonTriggersListener() {
+        Reservation res = new Reservation("u1", "e1", "Test Gala", null, "Montreal", "Social");
+        adapter.submitList(Arrays.asList(res));
+
+        FrameLayout parent = new FrameLayout(context);
+        ReservationAdapter.ReservationViewHolder holder = adapter.onCreateViewHolder(parent, 0);
+        adapter.onBindViewHolder(holder, 0);
+
+        // Simulate user clicking "Cancel" on their ticket
+        holder.btnCancel.performClick();
+        verify(mockListener).onCancelClick(res);
     }
 }

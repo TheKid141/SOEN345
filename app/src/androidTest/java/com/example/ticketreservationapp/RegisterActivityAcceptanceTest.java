@@ -25,40 +25,26 @@ import static org.junit.Assert.assertEquals;
 public class RegisterActivityAcceptanceTest {
 
     @Before
-    public void setUp() {
-        Intents.init();
-    }
+    public void setUp() { Intents.init(); }
 
     @After
-    public void tearDown() {
-        Intents.release();
-    }
+    public void tearDown() { Intents.release(); }
 
     @Test
-    public void testSuccessfulRegistrationNavigatesToEventList() throws InterruptedException {
+    public void testSuccessfulRegistrationNavigatesToEventList() {
         ActivityScenario.launch(RegisterActivity.class);
-
         String randomEmail = "testuser_" + UUID.randomUUID().toString().substring(0, 8) + "@example.com";
-
-        onView(withId(R.id.emailEditText))
-                .perform(replaceText(randomEmail), closeSoftKeyboard());
-
-        onView(withId(R.id.passwordEditText))
-                .perform(replaceText("validPassword123"), closeSoftKeyboard());
-
+        onView(withId(R.id.emailEditText)).perform(replaceText(randomEmail), closeSoftKeyboard());
+        onView(withId(R.id.passwordEditText)).perform(replaceText("validPassword123"), closeSoftKeyboard());
         onView(withId(R.id.registerEmailButton)).perform(click());
-
-        Thread.sleep(3000);
-
+        EspressoUtils.waitForView(withId(R.id.recyclerView), 5000);
         intended(hasComponent(EventListActivity.class.getName()));
     }
 
     @Test
     public void testBackButtonReturnsToLogin() {
         ActivityScenario<RegisterActivity> scenario = ActivityScenario.launch(RegisterActivity.class);
-
         onView(withId(R.id.btnBackToLogin)).perform(click());
-
         assertEquals(Lifecycle.State.DESTROYED, scenario.getState());
     }
 }

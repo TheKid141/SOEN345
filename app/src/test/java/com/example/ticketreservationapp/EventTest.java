@@ -52,6 +52,20 @@ public class EventTest {
     }
 
     @Test
+    void testCapacityHelpersRespectRemainingTickets() {
+        event.setCapacity(100);
+        event.setTicketsBooked(97);
+
+        assertEquals(3, event.getAvailableTickets());
+        assertFalse(event.isSoldOut());
+
+        event.setTicketsBooked(100);
+
+        assertEquals(0, event.getAvailableTickets());
+        assertTrue(event.isSoldOut());
+    }
+
+    @Test
     void testEmptyEventHandlesNullsGracefully() {
         assertNull(emptyEvent.getTitle());
         assertNull(emptyEvent.getRawDate());

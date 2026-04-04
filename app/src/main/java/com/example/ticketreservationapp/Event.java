@@ -12,9 +12,10 @@ public class Event {
     private Timestamp date;
     private String location;
     private String category;
-
     private String eventId;
     private String status;
+    private int capacity;
+    private int ticketsBooked;
 
     public Event() {}
 
@@ -54,6 +55,25 @@ public class Event {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
+
+    public int getTicketsBooked() {
+        return Math.max(0, ticketsBooked);
+    }
+    public void setTicketsBooked(int ticketsBooked) { this.ticketsBooked = ticketsBooked; }
+
+    @Exclude
+    public int getAvailableTickets() {
+        if (capacity <= 0) return Integer.MAX_VALUE;
+        return Math.max(0, capacity - ticketsBooked);
+    }
+
+    @Exclude
+    public boolean isSoldOut() {
+        return capacity > 0 && ticketsBooked >= capacity;
+    }
 
     @Exclude
     public String formatDate(Timestamp date, String type){

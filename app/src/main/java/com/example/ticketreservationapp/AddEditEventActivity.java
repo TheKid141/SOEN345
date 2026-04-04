@@ -3,6 +3,7 @@ package com.example.ticketreservationapp;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,11 +17,13 @@ import java.util.Locale;
 
 public class AddEditEventActivity extends AppCompatActivity {
 
-    private EditText etTitle, etLocation, etCategory;
+    private EditText etTitle, etLocation, etCategory, etCapacity;
     private Button btnSave, btnPickDate, btnPickTime;
     private TextView tvHeader;
     private EventViewModel eventViewModel;
     private String editEventId = null;
+    private String existingStatus = "active";
+    private int existingTicketsBooked = 0;
 
     private Calendar eventCalendar = Calendar.getInstance();
     private boolean isDateSelected = false;
@@ -41,6 +44,7 @@ public class AddEditEventActivity extends AppCompatActivity {
         btnPickTime = findViewById(R.id.btnPickEventTime);
         btnSave = findViewById(R.id.btnSaveEvent);
         tvHeader = findViewById(R.id.tvAdminTitle);
+        etCapacity = findViewById(R.id.etEventCapacity);
 
         android.widget.ImageButton btnBack = findViewById(R.id.btnBackFromAddEdit);
         btnBack.setOnClickListener(v -> finish());
@@ -77,6 +81,12 @@ public class AddEditEventActivity extends AppCompatActivity {
             etTitle.setText(getIntent().getStringExtra("EVENT_TITLE"));
             etLocation.setText(getIntent().getStringExtra("EVENT_LOCATION"));
             etCategory.setText(getIntent().getStringExtra("EVENT_CATEGORY"));
+            existingStatus = getIntent().getStringExtra("EVENT_STATUS");
+            if (existingStatus == null) existingStatus = "active";
+            existingTicketsBooked = getIntent().getIntExtra("EVENT_TICKETS_BOOKED", 0);
+
+            int existingCapacity = getIntent().getIntExtra("EVENT_CAPACITY", 0);
+            if (existingCapacity > 0) etCapacity.setText(String.valueOf(existingCapacity));
 
             long timestamp = getIntent().getLongExtra("EVENT_TIMESTAMP", -1);
             if (timestamp != -1) {
@@ -99,25 +109,36 @@ public class AddEditEventActivity extends AppCompatActivity {
         String title = etTitle.getText().toString().trim();
         String location = etLocation.getText().toString().trim();
         String category = etCategory.getText().toString().trim();
+        String capStr = etCapacity.getText().toString().trim();
 
-        // Use the InputValidator so it can be Unit Tested
+        // Validate the basic event details
         if (!validator.isEventInputValid(title, location, category, isDateSelected, isTimeSelected)) {
             Snackbar.make(findViewById(android.R.id.content), "Please fill all fields and select Date & Time", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
+        String capacityError = validator.validateCapacity(capStr, existingTicketsBooked);
+        if (capacityError != null) {
+            etCapacity.setError(capacityError);
+            return;
+        }
+
+        int capacity = capStr.isEmpty() ? 0 : Integer.parseInt(capStr);
+
         // Convert our Calendar into a Firebase Timestamp
         Timestamp firebaseTimestamp = new Timestamp(eventCalendar.getTime());
 
         Event event = new Event(title, firebaseTimestamp, location, category);
+        event.setCapacity(capacity);
+        event.setStatus(existingStatus);
+        event.setTicketsBooked(existingTicketsBooked);
 
         if (editEventId == null) {
-            // Add
+            // Add new even
             eventViewModel.addEvent(event, success -> {
                 if(success) finish();
             });
         } else {
-            // Edit
             eventViewModel.updateEvent(editEventId, event, success -> {
                 if(success) finish();
             });

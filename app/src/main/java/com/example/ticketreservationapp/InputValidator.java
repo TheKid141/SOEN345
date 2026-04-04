@@ -35,4 +35,22 @@ public class InputValidator {
                 && isDateSelected
                 && isTimeSelected;
     }
+
+    public String validateCapacity(String capStr, int existingTicketsBooked) {
+        if (capStr == null || capStr.trim().isEmpty()) {
+            return null; // Empty capacity is allowed (handled elsewhere as 0)
+        }
+        try {
+            int capacity = Integer.parseInt(capStr);
+            if (capacity < 1) {
+                return "Capacity must be at least 1";
+            }
+            if (existingTicketsBooked > 0 && capacity < existingTicketsBooked) {
+                return "Capacity cannot be less than tickets already booked";
+            }
+            return null;
+        } catch (NumberFormatException e) {
+            return "Enter a valid whole number";
+        }
+    }
 }

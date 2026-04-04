@@ -41,7 +41,6 @@ public class EventListActivity extends AppCompatActivity {
     private ReservationViewModel reservationViewModel;
     private Button btnFilter, btnLogout, btnMyReservations;
     private FloatingActionButton fabAddEvent;
-
     private Calendar selectedCalendar = null;
     private String selectedCategory = "All";
     private String selectedLocation = "All";
@@ -84,6 +83,9 @@ public class EventListActivity extends AppCompatActivity {
                 intent.putExtra("EVENT_TITLE", event.getTitle());
                 intent.putExtra("EVENT_LOCATION", event.getLocation());
                 intent.putExtra("EVENT_CATEGORY", event.getCategory());
+                intent.putExtra("EVENT_CAPACITY",  event.getCapacity());
+                intent.putExtra("EVENT_STATUS", event.getStatus());
+                intent.putExtra("EVENT_TICKETS_BOOKED", event.getTicketsBooked());
                 intent.putExtra("EVENT_TIMESTAMP", event.getRawDate() != null ? event.getRawDate().getTime() : -1);
                 startActivity(intent);
             }
@@ -317,32 +319,7 @@ public class EventListActivity extends AppCompatActivity {
     }
 
     private void applyFilters() {
-        List<Event> filteredList = new ArrayList<>();
-        for (Event event : fullEventList) {
-            boolean matchesDate = true;
-            boolean matchesCategory = true;
-            boolean matchesLocation = true;
-
-            if (selectedCalendar != null && event.getRawDate() != null) {
-                Calendar eventCal = Calendar.getInstance();
-                eventCal.setTime(event.getRawDate());
-                matchesDate = (eventCal.get(Calendar.YEAR) == selectedCalendar.get(Calendar.YEAR) &&
-                        eventCal.get(Calendar.DAY_OF_YEAR) == selectedCalendar.get(Calendar.DAY_OF_YEAR));
-            }
-
-            if (!selectedCategory.equals("All")) {
-                matchesCategory = selectedCategory.equalsIgnoreCase(event.getCategory());
-            }
-
-            if (!selectedLocation.equals("All")) {
-                matchesLocation = selectedLocation.equalsIgnoreCase(event.getLocation());
-            }
-
-            if (matchesDate && matchesCategory && matchesLocation) {
-                filteredList.add(event);
-            }
-        }
-        adapter.submitList(filteredList);
+        adapter.submitList(new EventFilterHelper().filterEvents(fullEventList, selectedCalendar, selectedCategory, selectedLocation));
     }
 
     private void sendConfirmationEmail(String userEmail, String eventTitle, String eventDate, String eventLocation, String reservationId) {

@@ -52,7 +52,9 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
                     return Objects.equals(oldItem.getTitle(), newItem.getTitle()) &&
                             Objects.equals(oldItem.getLocation(), newItem.getLocation()) &&
                             Objects.equals(oldItem.getCategory(), newItem.getCategory()) &&
-                            Objects.equals(oldItem.getStatus(), newItem.getStatus());
+                            Objects.equals(oldItem.getStatus(), newItem.getStatus()) &&
+                            oldItem.getCapacity() == newItem.getCapacity() &&
+                            oldItem.getTicketsBooked() == newItem.getTicketsBooked();
                 }
             };
 
@@ -83,6 +85,26 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
         holder.tvCategory.setText(context.getString(R.string.event_category_format, event.getCategory()));
 
         boolean isSuspended = "cancelled".equals(event.getStatus());
+        boolean isSoldOut   = event.isSoldOut();
+
+        if (holder.tvCapacity != null) {
+            if (event.getCapacity() > 0 && !isSuspended) {
+                holder.tvCapacity.setVisibility(View.VISIBLE);
+                int available = event.getAvailableTickets();
+                holder.tvCapacity.setText(context.getString(
+                        R.string.event_capacity_format, available, event.getCapacity()));
+
+                if (isSoldOut) {
+                    holder.tvCapacity.setTextColor(Color.RED);
+                } else if (available <= Math.max(1, event.getCapacity() / 10)) {
+                    holder.tvCapacity.setTextColor(Color.parseColor("#E65100")); // orange warning
+                } else {
+                    holder.tvCapacity.setTextColor(Color.parseColor("#388E3C")); // green
+                }
+            } else {
+                holder.tvCapacity.setVisibility(View.GONE);
+            }
+        }
 
         if (isAdmin) {
             holder.btnReserve.setVisibility(View.GONE);
@@ -107,10 +129,10 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
                 });
             }
         } else {
-            // --- Customer View ---
             if (holder.adminControlsLayout != null) holder.adminControlsLayout.setVisibility(View.GONE);
             holder.tvStatus.setVisibility(View.GONE);
             holder.btnReserve.setVisibility(View.VISIBLE);
+            holder.btnReserve.setOnClickListener(null);
 
             if (isSuspended) {
                 holder.btnReserve.setText("Cancelled");
@@ -118,6 +140,12 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
                 holder.btnReserve.setAlpha(1.0f);
                 holder.btnReserve.setTextColor(Color.WHITE);
                 holder.btnReserve.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#D32F2F"))); // Red Warning Color
+            } else if(isSoldOut){
+                holder.btnReserve.setText("Sold Out");
+                holder.btnReserve.setEnabled(false);
+                holder.btnReserve.setAlpha(1.0f);
+                holder.btnReserve.setTextColor(Color.WHITE);
+                holder.btnReserve.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#757575")));
             } else if (reservedEventIds.contains(event.getEventId())) {
                 holder.btnReserve.setText("Reserved");
                 holder.btnReserve.setEnabled(false);
@@ -136,7 +164,7 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
     }
 
     static class EventViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvDate, tvLocation, tvCategory, tvStatus;
+        TextView tvTitle, tvDate, tvLocation, tvCategory, tvStatus, tvCapacity;
         Button btnReserve;
         LinearLayout adminControlsLayout;
         Button btnEditEvent, btnCancelEvent;
@@ -148,6 +176,7 @@ public class EventAdapter extends ListAdapter<Event, EventAdapter.EventViewHolde
             tvLocation = itemView.findViewById(R.id.tvLocation);
             tvCategory = itemView.findViewById(R.id.tvCategory);
             tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvCapacity = itemView.findViewById(R.id.tvCapacity);
             btnReserve = itemView.findViewById(R.id.btnReserve);
             adminControlsLayout = itemView.findViewById(R.id.adminControlsLayout);
             btnEditEvent = itemView.findViewById(R.id.btnEditEvent);
