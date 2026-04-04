@@ -13,12 +13,10 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.intent.VerificationModes.times;
 
@@ -38,12 +36,9 @@ public class LoginActivityAcceptanceTest {
     @Test
     public void emptyPassword(){
         ActivityScenario.launch(LoginActivity.class);
-
-        onView(withId(R.id.loginEmailEditText)).perform(typeText("test@example.com"), closeSoftKeyboard());
+        onView(withId(R.id.loginEmailEditText)).perform(replaceText("test@example.com"), closeSoftKeyboard());
         onView(withId(R.id.loginButton)).perform(click());
-
-        onView(withId(R.id.loginPasswordEditText))
-                .check(matches(hasErrorText("Please enter a password")));
+        onView(withId(R.id.loginPasswordEditText)).check(matches(hasErrorText("Please enter a password")));
     }
 
     @Test
@@ -56,29 +51,28 @@ public class LoginActivityAcceptanceTest {
     @Test
     public void InvalidEmail(){
         ActivityScenario.launch(LoginActivity.class);
-        onView(withId(R.id.loginEmailEditText)).perform(typeText("notanemail"), closeSoftKeyboard());
+        onView(withId(R.id.loginEmailEditText)).perform(replaceText("notanemail"), closeSoftKeyboard());
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.loginEmailEditText)).check(matches(hasErrorText("Please enter a valid email address")));
     }
 
     @Test
-    public void invalidUser() throws InterruptedException {
+    public void invalidUser() {
         ActivityScenario.launch(LoginActivity.class);
-
-        onView(withId(R.id.loginEmailEditText)).perform(typeText("invalid@example.com"), closeSoftKeyboard());
-        onView(withId(R.id.loginPasswordEditText)).perform(typeText("invalidpw"), closeSoftKeyboard());
+        onView(withId(R.id.loginEmailEditText)).perform(replaceText("invalid@example.com"), closeSoftKeyboard());
+        onView(withId(R.id.loginPasswordEditText)).perform(replaceText("invalidpw"), closeSoftKeyboard());
         onView(withId(R.id.loginButton)).perform(click());
-        Thread.sleep(2000);
+        EspressoUtils.waitForView(withId(R.id.loginButton), 3000);
         intended(hasComponent(EventListActivity.class.getName()), times(0));
     }
 
     @Test
-    public void validUser() throws InterruptedException {
+    public void validUser() {
         ActivityScenario.launch(LoginActivity.class);
         onView(withId(R.id.loginEmailEditText)).perform(replaceText("testuser_ddfded96@example.com"), closeSoftKeyboard());
         onView(withId(R.id.loginPasswordEditText)).perform(replaceText("validPassword123"), closeSoftKeyboard());
         onView(withId(R.id.loginButton)).perform(click());
-        Thread.sleep(3000);
+        EspressoUtils.waitForView(withId(R.id.recyclerView), 5000);
         intended(hasComponent(EventListActivity.class.getName()));
     }
 }
