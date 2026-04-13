@@ -154,8 +154,15 @@ public class EventListActivity extends AppCompatActivity {
         btnFilter.setOnClickListener(v -> showFilterDialog());
 
         btnMyReservations.setOnClickListener(v -> {
-            Intent intent = new Intent(EventListActivity.this, MyReservationsActivity.class);
-            startActivity(intent);
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                Intent intent = new Intent(EventListActivity.this, MyReservationsActivity.class);
+                intent.putExtra("USER_ID", currentUser.getUid());
+                startActivity(intent);
+            } else {
+                Snackbar.make(findViewById(android.R.id.content),
+                        "Error: Not logged in.", Snackbar.LENGTH_SHORT).show();
+            }
         });
 
         btnLogout.setOnClickListener(v -> {
