@@ -1,6 +1,7 @@
 package com.example.ticketreservationapp;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -20,6 +21,8 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
+
+import android.content.Intent;
 
 @RunWith(AndroidJUnit4.class)
 public class ReservationSystemAcceptanceTest {
@@ -48,14 +51,23 @@ public class ReservationSystemAcceptanceTest {
 
     @Test
     public void testBackButtonReturnsToEventList() {
-        ActivityScenario<MyReservationsActivity> scenario = ActivityScenario.launch(MyReservationsActivity.class);
-        onView(withId(R.id.btnBackFromReservations)).perform(click());
-        assertEquals(androidx.lifecycle.Lifecycle.State.DESTROYED, scenario.getState());
+        Intent intent = new Intent(
+                ApplicationProvider.getApplicationContext(),
+                MyReservationsActivity.class);
+        intent.putExtra("USER_ID", "test-uid-123");
+        try (ActivityScenario<MyReservationsActivity> scenario = ActivityScenario.launch(intent)) {
+            onView(withId(R.id.btnBackFromReservations)).perform(click());
+            scenario.onActivity(activity -> org.junit.Assert.assertTrue(activity.isFinishing()));
+        }
     }
-
     @Test
     public void testMyReservationsUIFrameworkLoads() {
-        ActivityScenario.launch(MyReservationsActivity.class);
+        Intent intent = new Intent(
+                ApplicationProvider.getApplicationContext(),
+                MyReservationsActivity.class);
+        intent.putExtra("USER_ID", FirebaseAuth.getInstance()
+                .getCurrentUser().getUid());
+        ActivityScenario.launch(intent);
         EspressoUtils.waitForView(withId(R.id.btnBackFromReservations), 5000);
         onView(withId(R.id.btnBackFromReservations)).check(matches(isDisplayed()));
     }

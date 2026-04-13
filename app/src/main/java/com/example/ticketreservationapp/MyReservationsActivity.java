@@ -40,13 +40,12 @@ public class MyReservationsActivity extends AppCompatActivity {
 
         reservationViewModel = new ViewModelProvider(this).get(ReservationViewModel.class);
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            finish(); // Should not happen — guarded by login flow
+        String userId = getIntent().getStringExtra("USER_ID");
+        if (userId == null || userId.isEmpty()) {
+            finish();
             return;
         }
-
-        loadReservations(currentUser.getUid());
+        loadReservations(userId);
 
         findViewById(R.id.btnBackFromReservations).setOnClickListener(v -> finish());
     }

@@ -43,8 +43,10 @@ public class RegisterActivityAcceptanceTest {
 
     @Test
     public void testBackButtonReturnsToLogin() {
-        ActivityScenario<RegisterActivity> scenario = ActivityScenario.launch(RegisterActivity.class);
+        ActivityScenario<RegisterActivity> scenario =
+                ActivityScenario.launchActivityForResult(RegisterActivity.class);
         onView(withId(R.id.btnBackToLogin)).perform(click());
-        assertEquals(Lifecycle.State.DESTROYED, scenario.getState());
+        assertEquals(android.app.Activity.RESULT_CANCELED,
+                scenario.getResult().getResultCode());
     }
 }
