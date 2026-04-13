@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNotNull;
 @Config(sdk = 28)
 public class UIBranchesCoverageTest {
 
-    // THIS IS THE MISSING PIECE!
     @Before
     public void setupFirebase() {
         if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {

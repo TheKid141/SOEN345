@@ -56,7 +56,6 @@ public class RepositoryCoverageTest {
         // Use a latch to wait for 3 asynchronous callbacks
         CountDownLatch latch = new CountDownLatch(3);
 
-        // Fix: Create a dummy reservation with a non-null eventId to prevent Firebase NPE
         Reservation dummyReservation = new Reservation();
         dummyReservation.setEventId("dummy-event-id");
 
