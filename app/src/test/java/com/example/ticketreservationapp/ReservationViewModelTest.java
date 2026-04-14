@@ -46,7 +46,7 @@ public class ReservationViewModelTest {
     }
 
     @Test
-    void testGetReservationsForUser_Success() {
+    void testGetReservationsForUser() {
         List<Reservation> mockList = new ArrayList<>();
         mockList.add(new Reservation("u1", "e1", "Event 1", null, "Loc 1", "Cat 1"));
         
@@ -63,7 +63,7 @@ public class ReservationViewModelTest {
     }
 
     @Test
-    void testCancelReservation_Success() {
+    void testCancelReservationSuccess() {
         String resId = "res123";
         ReservationRepository.ReservationCallback mockCallback = mock(ReservationRepository.ReservationCallback.class);
 
@@ -80,7 +80,7 @@ public class ReservationViewModelTest {
     }
 
     @Test
-    void testCancelReservation_Failure() {
+    void testCancelReservationFailure() {
         String resId = "res123";
         ReservationRepository.ReservationCallback mockCallback = mock(ReservationRepository.ReservationCallback.class);
 
@@ -96,7 +96,7 @@ public class ReservationViewModelTest {
     }
 
     @Test
-    void testHasActiveReservation_True() {
+    void testHasActiveReservation() {
         ReservationRepository.ExistsCallback mockCallback = mock(ReservationRepository.ExistsCallback.class);
         viewModel.hasActiveReservation("u1", "e1", mockCallback);
 
@@ -109,7 +109,7 @@ public class ReservationViewModelTest {
     }
 
     @Test
-    void testGetReservationsForNullUserReturnsEmpty() {
+    void testGetReservationsNullUser() {
         MutableLiveData<List<Reservation>> emptyData = new MutableLiveData<>(new ArrayList<>());
         when(mockRepository.getReservationsForUser(null)).thenReturn(emptyData);
 
@@ -118,7 +118,7 @@ public class ReservationViewModelTest {
     }
 
     @Test
-    void testCreateReservation_Success() {
+    void testCreateReservation() {
         Reservation newRes = new Reservation("u1", "e1", "Gala", null, "MTL", "Social");
         ReservationRepository.ReservationCallback mockCallback = mock(ReservationRepository.ReservationCallback.class);
 

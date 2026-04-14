@@ -15,62 +15,60 @@ public class InputValidatorTest {
 
     // --- Email Tests ---
     @Test
-    void testValidEmailReturnsNull() {
+    void testValidEmail() {
         assertNull(validator.validateEmail("test@gmail.com"));
         assertNull(validator.validateEmail("student.name@concordia.ca"));
     }
     @Test
-    void testEmptyEmailReturnsError() {
+    void testEmptyEmail() {
         assertEquals("Please enter an email address", validator.validateEmail(""));
     }
     @Test
-    void testNullEmailReturnsError() {
+    void testNullEmail() {
         assertEquals("Please enter an email address", validator.validateEmail(null));
     }
     @Test
-    void testWhitespaceEmailReturnsError() {
+    void testWhitespaceEmail() {
         assertEquals("Please enter an email address", validator.validateEmail("   "));
     }
     @Test
-    void testEmailWithoutAtSymbolReturnsError() {
+    void testEmailWithoutAtSymbol() {
         assertEquals("Please enter a valid email address", validator.validateEmail("testemail.com"));
     }
     @Test
-    void testEmailWithoutDomainReturnsError() {
+    void testEmailWithoutDomain() {
         assertEquals("Please enter a valid email address", validator.validateEmail("test@.com"));
         assertEquals("Please enter a valid email address", validator.validateEmail("test@domain"));
     }
 
     // --- Password Tests ---
     @Test
-    void testValidPasswordReturnsNull() {
+    void testValidPassword() {
         assertNull(validator.validatePassword("password123"));
         assertNull(validator.validatePassword("securePassw0rd!"));
     }
     @Test
-    void testShortPasswordReturnsError() {
+    void testShortPassword() {
         assertEquals("Password must be at least 6 characters", validator.validatePassword("12345"));
     }
     @Test
-    void testPasswordExactlySixCharactersReturnsNull() {
+    void testPasswordExactlySixCharacters() {
         assertNull(validator.validatePassword("123456"));
     }
     @Test
-    void testNullPasswordReturnsError() {
+    void testNullPassword() {
         assertEquals("Please enter a password", validator.validatePassword(null));
     }
     @Test
-    void testEmptyPasswordReturnsError() {
+    void testEmptyPassword() {
         assertEquals("Please enter a password", validator.validatePassword(""));
     }
     @Test
-    void testWhitespacePasswordReturnsError() {
+    void testWhitespacePassword() {
         assertEquals("Please enter a password", validator.validatePassword("     "));
     }
     @Test
-    void testPasswordBoundaryValues() {
-        assertEquals("Password must be at least 6 characters", validator.validatePassword("12345"));
-        assertNull(validator.validatePassword("123456"));
+    void testPasswordUpperBoundaryValue() {
         assertNull(validator.validatePassword("1234567"));
     }
 
@@ -79,49 +77,49 @@ public class InputValidatorTest {
     // =========================================================================
 
     @Test
-    void shouldPassWhenAllEventInputsAreValid() {
+    void validEventInputs() {
         assertTrue(validator.isEventInputValid("Concert", "Montreal", "Music", true, true));
     }
 
     @Test
-    void shouldFailWhenEventTitleIsEmpty() {
+    void EmptyEventTitle() {
         assertFalse(validator.isEventInputValid("", "Montreal", "Music", true, true));
     }
 
     @Test
-    void shouldFailWhenEventLocationIsEmpty() {
+    void emptyEventLocation() {
         assertFalse(validator.isEventInputValid("Concert", "", "Music", true, true));
     }
 
     @Test
-    void shouldFailWhenEventDateIsNotSelected() {
+    void eventDateIsNotSelected() {
         assertFalse(validator.isEventInputValid("Concert", "Montreal", "Music", false, true));
     }
 
     @Test
-    void shouldFailWhenEventTimeIsNotSelected() {
+    void eventTimeIsNotSelected() {
         assertFalse(validator.isEventInputValid("Concert", "Montreal", "Music", true, false));
     }
 
     // Capacity Tests
     @Test
-    void testValidCapacityReturnsNull() {
-        assertNull(validator.validateCapacity("100", 50));
+    void testValidCapacity() {
+            assertNull(validator.validateCapacity("100", 50));
     }
 
     @Test
-    void testCapacityLessThanOneReturnsError() {
+    void testCapacityLessThanOne() {
         assertEquals("Capacity must be at least 1", validator.validateCapacity("0", 0));
         assertEquals("Capacity must be at least 1", validator.validateCapacity("-5", 0));
     }
 
     @Test
-    void testCapacityNotANumberReturnsError() {
+    void testCapacityNAN() {
         assertEquals("Enter a valid whole number", validator.validateCapacity("abc", 0));
     }
 
     @Test
-    void testCapacityLessThanExistingBookingsReturnsError() {
+    void testCapacityLessThanBookings() {
         assertEquals("Capacity cannot be less than tickets already booked", validator.validateCapacity("50", 60));
     }
 }

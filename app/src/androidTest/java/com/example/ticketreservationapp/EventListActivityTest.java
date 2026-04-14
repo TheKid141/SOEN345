@@ -21,7 +21,7 @@ public class EventListActivityTest {
     public ActivityScenarioRule<EventListActivity> activityRule = new ActivityScenarioRule<>(EventListActivity.class);
 
     @Test
-    public void recyclerViewIsDisplayed() {
+    public void testRecyclerView() {
         activityRule.getScenario().onActivity(activity -> {
             activity.getWindow().getDecorView().requestFocus();
         });
@@ -36,7 +36,7 @@ public class EventListActivityTest {
     }
 
     @Test
-    public void testFilterDialogOpensAndClears() {
+    public void testFilterDialog() {
         ActivityScenario.launch(EventListActivity.class);
         onView(withId(R.id.btnFilter)).perform(click());
         onView(withId(R.id.spinnerCategory)).check(matches(isDisplayed()));

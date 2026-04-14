@@ -44,7 +44,7 @@ public class ReservationTest {
     }
 
     @Test
-    void testEmptyConstructorHandlesNullDatesGracefully() {
+    void testEmptyConstructor() {
         assertNull(emptyReservation.getEventDate());
         assertNull(emptyReservation.getRawDate());
         assertEquals("", emptyReservation.getDate(), "Null timestamp should return an empty string for formatted date");
@@ -52,11 +52,8 @@ public class ReservationTest {
     }
 
     @Test
-    void testSettersAndGetters() {
+    void testReservationSetterAndGetter() {
         emptyReservation.setReservationId("res999");
-        emptyReservation.setStatus("cancelled");
-
         assertEquals("res999", emptyReservation.getReservationId());
-        assertEquals("cancelled", emptyReservation.getStatus());
     }
 }

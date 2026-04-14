@@ -52,7 +52,7 @@ public class EventViewModelTest {
     }
 
     @Test
-    void testGetEventsReturnsDataFromRepository() {
+    void testGetEvents() {
         List<Event> result = viewModel.getEvents().getValue();
 
         assertNotNull(result);
@@ -63,7 +63,7 @@ public class EventViewModelTest {
     }
 
     @Test
-    void testUpdateEvent_Success() {
+    void testUpdateEvent() {
         Event updatedEvent = new Event("Updated", null, "Tor", "Art");
         EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
 
@@ -77,7 +77,7 @@ public class EventViewModelTest {
     }
 
     @Test
-    void testAddEvent_Success() {
+    void testAddEvent() {
         Event newEvent = new Event("New", null, "MTL", "Music");
         EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
 
@@ -91,7 +91,7 @@ public class EventViewModelTest {
     }
 
     @Test
-    void testDeleteEvent_Success() {
+    void testDeleteEvent() {
         EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
         viewModel.deleteEvent("e123", mockCallback);
 
@@ -103,7 +103,7 @@ public class EventViewModelTest {
     }
 
     @Test
-    void testCancelEvent_Success() {
+    void testCancelEvent() {
         EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
         viewModel.cancelEvent("e123", mockCallback);
 
@@ -115,7 +115,7 @@ public class EventViewModelTest {
     }
 
     @Test
-    void testRestoreEvent_Success() {
+    void testRestoreEvent() {
         EventRepository.ActionCallback mockCallback = mock(EventRepository.ActionCallback.class);
         viewModel.restoreEvent("e123", mockCallback);
 

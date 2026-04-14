@@ -56,7 +56,7 @@ public class EventFilterTest {
     }
 
     @Test
-    void testClearFiltersReturnsAll() {
+    void testClearFilters() {
         List<Event> filtered = filterHelper.filterEvents(fullList, null, "All", "All");
         assertEquals(3, filtered.size());
     }

@@ -88,7 +88,7 @@ public class ReservationRepository {
             if ("cancelled".equals(reservation.getStatus())) {
                 return null;
             }
-
+    
             String eventId = reservation.getEventId();
             if (eventId != null && !eventId.trim().isEmpty()) {
                 DocumentReference eventRef = db.collection("events").document(eventId);

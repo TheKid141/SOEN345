@@ -1,12 +1,7 @@
 package com.example.ticketreservationapp;
 
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -65,7 +60,7 @@ public class ReservationAdapterTest {
     }
 
     @Test
-    public void testCancelReservationButtonTriggersListener() {
+    public void testCancelReservationButton() {
         Reservation res = new Reservation("u1", "e1", "Test Gala", null, "Montreal", "Social");
         adapter.submitList(Arrays.asList(res));
 

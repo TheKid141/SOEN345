@@ -22,27 +22,11 @@ public class EventTest {
     }
 
     @Test
-    void testGetTitle(){
+    void testContructorInitialization() {
         assertEquals("Art Exhibition", event.getTitle());
-    }
-
-    @Test
-    void testGetLocation(){
         assertEquals("Pierrefonds-Roxboro", event.getLocation());
-    }
-
-    @Test
-    void testGetCategory(){
         assertEquals("Art", event.getCategory());
-    }
-
-    @Test
-    void testGetDate(){
         assertEquals("Apr 18, 2026", event.getFormattedDate());
-    }
-
-    @Test
-    void testGetDateTime(){
         assertTrue(event.getDateTime().contains("07:45"));
     }
 
@@ -52,7 +36,7 @@ public class EventTest {
     }
 
     @Test
-    void testCapacityHelpersRespectRemainingTickets() {
+    void testCapacityRemainingTickets() {
         event.setCapacity(100);
         event.setTicketsBooked(97);
 
@@ -66,7 +50,7 @@ public class EventTest {
     }
 
     @Test
-    void testEmptyEventHandlesNullsGracefully() {
+    void testEmptyEvent() {
         assertNull(emptyEvent.getTitle());
         assertNull(emptyEvent.getRawDate());
         assertEquals("", emptyEvent.getFormattedDate());

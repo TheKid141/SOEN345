@@ -34,7 +34,7 @@ public class EventAdapterTest {
     }
 
     @Test
-    public void testCustomerViewRendersReserveButtonAndHidesAdminControls() {
+    public void testCustomerView() {
         EventAdapter adapter = new EventAdapter(false, mockReserveListener, mockAdminListener);
         Event event = new Event("Test", null, "Loc", "Cat");
         adapter.submitList(Arrays.asList(event));
@@ -49,7 +49,7 @@ public class EventAdapterTest {
     }
 
     @Test
-    public void testAdminViewRendersManageButtonsAndHidesReserve() {
+    public void testAdminView() {
         EventAdapter adapter = new EventAdapter(true, mockReserveListener, mockAdminListener);
         Event event = new Event("Test", null, "Loc", "Cat");
         adapter.submitList(Arrays.asList(event));
@@ -64,7 +64,7 @@ public class EventAdapterTest {
     }
 
     @Test
-    public void testCustomerReserveButtonTriggersListener() {
+    public void testCustomerReserveButton() {
         EventAdapter adapter = new EventAdapter(false, mockReserveListener, mockAdminListener);
         Event event = new Event("Test Event", null, "Loc", "Cat");
         adapter.submitList(Arrays.asList(event));
@@ -81,7 +81,7 @@ public class EventAdapterTest {
     }
 
     @Test
-    public void testAdminEditButtonTriggersListener() {
+    public void testAdminEditButton() {
         EventAdapter adapter = new EventAdapter(true, mockReserveListener, mockAdminListener);
         Event event = new Event("Test Event", null, "Loc", "Cat");
         adapter.submitList(Arrays.asList(event));
@@ -95,7 +95,7 @@ public class EventAdapterTest {
     }
 
     @Test
-    public void testAdminCancelButtonTriggersListener() {
+    public void testAdminCancelButton() {
         EventAdapter adapter = new EventAdapter(true, mockReserveListener, mockAdminListener);
         Event event = new Event("Test Event", null, "Loc", "Cat");
         adapter.submitList(Arrays.asList(event));
