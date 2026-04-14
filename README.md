@@ -54,31 +54,31 @@ cd ticketreservationapp
 
 #### 2. Add Your Firebase Configuration File
 
-Go to your Firebase Console.
+- Go to your Firebase Console.
 
-Click on Add App and select the Android icon.
+- Click on Add App and select the Android icon.
 
-Enter your application's package name (e.g., com.example.ticketreservationapp).
+- Enter your application's package name (e.g., com.example.ticketreservationapp).
 
-Click Register app and download the google-services.json file.
+- Click Register app and download the google-services.json file.
 
-Move the downloaded google-services.json file into your project's app/ directory.
+- Move the downloaded google-services.json file into your project's app/ directory.
 
-Ensure the google-services.json file is ignored by Git in your .gitignore file.
+- Ensure the google-services.json file is ignored by Git in your .gitignore file.
 
 #### 3. Configure EmailJS API Keys
 
-The application uses EmailJS to send transactional emails. You must replace the hardcoded API keys with your own to enable email functionality.
+- The application uses EmailJS to send transactional emails. You must replace the hardcoded API keys with your own to enable email functionality.
 
-Create a free account at EmailJS.
+- Create a free account at EmailJS.
 
-Add an Email Service and note your service_id.
+- Add an Email Service and note your service_id.
 
-Create two Email Templates (one for Confirmations, one for Cancellations) and note their template_ids.
+- Create two Email Templates (one for Confirmations, one for Cancellations) and note their template_ids.
 
-Locate your Public Key (user_id) in the Account settings.
+- Locate your Public Key (user_id) in the Account settings.
 
-Open src/main/java/com/example/ticketreservationapp/EventListActivity.java and locate the sendConfirmationEmail method. Replace the following strings with your credentials:
+- Open src/main/java/com/example/ticketreservationapp/EventListActivity.java and locate the sendConfirmationEmail method. Replace the following strings with your credentials:
 
 ```java
 "\"service_id\":\"YOUR_SERVICE_ID\","
@@ -86,7 +86,7 @@ Open src/main/java/com/example/ticketreservationapp/EventListActivity.java and l
 "\"user_id\":\"YOUR_PUBLIC_KEY\","
 ```
 
-Open src/main/java/com/example/ticketreservationapp/MyReservationsActivity.java and locate the sendCancellationEmail method. Update the strings with your credentials:
+- Open src/main/java/com/example/ticketreservationapp/MyReservationsActivity.java and locate the sendCancellationEmail method. Update the strings with your credentials:
 
 ```java
 "\"service_id\":\"YOUR_SERVICE_ID\","
@@ -96,9 +96,9 @@ Open src/main/java/com/example/ticketreservationapp/MyReservationsActivity.java 
 
 #### 4. Build and Run
 
-Sync the project with Gradle files in Android Studio.
+- Sync the project with Gradle files in Android Studio.
 
-Build the project via command line (or press Run in Android Studio):
+- Build the project via command line (or press Run in Android Studio):
 
 ```bash
 ./gradlew assembleDebug
